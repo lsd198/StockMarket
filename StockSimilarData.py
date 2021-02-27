@@ -20,8 +20,8 @@ class StockSmiliar:
         self.col = []
         self.orgdata = pd.DataFrame()
         self.strattest = 0
-
-
+# vARIABLE ASSIGNMENT TO STORE THE INDEX NUMBER WITH VALUES  OF THE MATCHED VALUES
+# cRETAE LIST INSISDE LIST. INSIDE LIST WILL CONSIST OF SERIES THAT WILL HAVE THE VALUES AND INDEX NUMBER OF MATCHED ONE
 
     def extract_pattern(self, orid_data, comp_data):
         for val in range(len(orid_data)):
@@ -48,10 +48,10 @@ class StockSmiliar:
         self.i = self.i + 1
 
     def data_forward(self, data_or, data_comp):
-
-        while (len(data_comp.lag1[self.i:]) >= len(data_or)):
+        # extracting the 3 pairs and send it over to the above function for comparision
+        while (len(data_comp.lag1[0:len(data_or)-self.i]) >= len(data_or)):
             print('DataForward--->',self.i)
-            self.extract_pattern(data_or, data_comp[(len(data_or)+self.start):(len(data_or)+self.start)-3])
+            self.extract_pattern(data_or, data_comp[len(data_comp)-len(data_or)-self.i:len(data_comp)-self.i])
         print('printing the common', self.matched)
         self.col.append(self.matched)
         self.i=0
@@ -59,12 +59,15 @@ class StockSmiliar:
 
 # Below fucntion will prepare the data that will later compared to that the whole data set
     def train_dat(self,df_comp):
-        for i in range(len(df_comp)):
-            comp_list = df_comp.iloc[i:i+3]
-            self.data_forward(comp_list,df_comp)
-            print('Loop run-->', i,'Matchged values for this loop', self.matched)
-            self.matched=0
-            self.strattest=i
+        for i in reversed(range(len(df_comp))):
+            if i >=3:
+                comp_list = df_comp.iloc[i-2:i+1]
+                self.data_forward(comp_list,df_comp)
+                print('Loop run-->', i,'Matchged values for this loop', self.matched)
+                self.matched=0
+                self.strattest=i
+            else:
+                break
         match=pd.DataFrame(self.col)
         match.to_csv('match.csv')
         return match
@@ -77,18 +80,14 @@ raw_csv_data=raw_csv_data.set_index('Datetime')
 df_comp = pd.DataFrame(raw_csv_data.Close)
 df_comp['lag1'] = df_comp.Close-df_comp.Close.shift(1)
 df_comp = df_comp.drop(['2021-01-11 09:30:00-05:00'], axis=0)
+len_df=len(df_comp)
 # df_comp.date = pd.to_datetime(df_comp.date, dayfirst=True)
 # df_comp.set_index("date", inplace=True)
 # df_comp = df_comp.asfreq('b')
 # df_comp = df_comp.fillna(method='ffill')
-train_list = df_comp.iloc[2:5]
-print(train_list)
+# train_list = df_comp.iloc[2:5]
+# print(train_list)
 obj_sm = StockSmiliar()
 obj_sm.train_dat(df_comp)
 # obj_sm.data_forward(train_list, df_comp)
 
-
-a=[2,3,4,5,5,6,7,74,3,2,4,5,76,7]
-
-for i in reversed(range(len(a))):
-    print(i)

@@ -12,7 +12,7 @@ class getdata:
     def __init__(self):
         print('inside the init function')
         self.app = yf.Ticker("AAPL")
-        self.dataset_org = pd.DataFrame(self.app.history(start="2021-01-11", end="2021-01-15", interval="1m"))
+        self.dataset_org = pd.DataFrame(self.app.history(start="2021-01-18", end="2021-01-22", interval="1m"))
         self.col = self.dataset_org.columns
 
     # /check for the missing values
@@ -31,7 +31,7 @@ class getdata:
                               'Database=StockMarket;'
                               'Trusted_Connection=yes;')
         cursor = conn.cursor()
-        print('lal singh dhaila')
+        # print('lal singh dhaila')
         print(self.dataset_org)
         data_new = pd.DataFrame(self.dataset_org.reset_index())
         data_new['Datetime'] = [i.strftime("%m/%d/%Y %H:%M:%S") for i in data_new['Datetime']]
