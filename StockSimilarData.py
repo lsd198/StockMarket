@@ -89,14 +89,17 @@ class StockSmiliar:
                 self.matched=0
                 self.temp_data.clear()
                 self.strattest=i
+
             # else:
             #     break
         match=pd.DataFrame(self.col)
         match.to_csv('match.csv')
-        self.final_list
+        # self.write_file()
         return match
 
-
+    # def write_file(self):
+    #     f = open("myfile.txt", "x")
+    #     f.write(self.final_list)
 raw_csv_data = pd.read_csv("StockDtaonminfoyweeklast.csv")
 raw_csv_data=raw_csv_data.set_index('Datetime')
 df_comp = pd.DataFrame(raw_csv_data.Close)
