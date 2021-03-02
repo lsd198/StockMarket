@@ -1,4 +1,5 @@
 import pandas as pd
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.graphics.tsaplots as sgt
@@ -100,6 +101,7 @@ class StockSmiliar:
     # def write_file(self):
     #     f = open("myfile.txt", "x")
     #     f.write(self.final_list)
+start_time=time.perf_counter()
 raw_csv_data = pd.read_csv("StockDtaonminfoyweeklast.csv")
 raw_csv_data=raw_csv_data.set_index('Datetime')
 df_comp = pd.DataFrame(raw_csv_data.Close)
@@ -114,5 +116,7 @@ len_df=len(df_comp)
 # print(train_list)
 obj_sm = StockSmiliar()
 obj_sm.train_dat(df_comp)
+finish_time=time.perf_counter()
+print(f'Finished in {round(finish_time-start_time)/3600} hours(h)')
 # obj_sm.data_forward(train_list, df_comp)
 

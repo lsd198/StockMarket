@@ -257,3 +257,6 @@ test_list = pd.DataFrame((df_comp.spx[:50]-df_comp.spx[0:50].shift(1)).drop(pd.T
     #
     #
     #
+
+
+p1=multiprocessing.
