@@ -94,7 +94,7 @@ class StockSmiliar:
             # else:
             #     break
         match=pd.DataFrame(self.col)
-        match.to_csv('match.csv')
+        # match.to_csv('match.csv')
         # self.write_file()
         return match
 

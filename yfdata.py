@@ -1,5 +1,6 @@
 import yfinance as yf
 import pandas as pd
+import StockSimilarData as stck
 import numpy as np
 import matplotlib.pyplot as plt
 import statsmodels.graphics.tsaplots as sgt
