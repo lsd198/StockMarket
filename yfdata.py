@@ -1,7 +1,7 @@
 import yfinance as yf
 import pandas as pd
-import StockSimilarData as stck
 import numpy as np
+import datetime
 import matplotlib.pyplot as plt
 import statsmodels.graphics.tsaplots as sgt
 import statsmodels.tsa.stattools as sts
@@ -13,7 +13,7 @@ class getdata:
     def __init__(self):
         print('inside the init function')
         self.app = yf.Ticker("AAPL")
-        self.dataset_org = pd.DataFrame(self.app.history(start="2021-01-18", end="2021-01-22", interval="1m"))
+        self.dataset_org = pd.DataFrame(self.app.history(start="2021-02-22", end="2021-02-27", interval="1m"))
         self.col = self.dataset_org.columns
 
     # /check for the missing values
@@ -32,23 +32,32 @@ class getdata:
                               'Database=StockMarket;'
                               'Trusted_Connection=yes;')
         cursor = conn.cursor()
-        # print('lal singh dhaila')
-        print(self.dataset_org)
+
         data_new = pd.DataFrame(self.dataset_org.reset_index())
-        data_new['Datetime'] = [i.strftime("%m/%d/%Y %H:%M:%S") for i in data_new['Datetime']]
+        # data_new['Datetime'] = [[for i in ] for i in range(len(data_new))]
 
         for records in range(len(data_new)):
             data = [list(data_new.iloc[records,:])]
-            for lst in data:
-                lst = [str(val) for val in lst]
-                cursor.execute("""INSERT INTO Apple values(?,?,?,?,?,?,?,?)""", lst)
-                cursor.commit()
+            # check datatype of all the variable
+            # ConnectionErrorompare if the variables are of datetime or int64 type
+            # if ye then change the datatype of the variable and store in the list
+            list_val=[]
+            for val in data[0]:
+                if(str(type(val)).split('.')[-1]).find('int64') == 0:
+                    list_val.append(int(val))
+                elif (str(type(val)).split('.')[-1]).find('Timestamp') == 0:
+                    list_val.append(datetime.datetime(val.year,val.month,val.day,val.hour,val.month,val.second))
+                else:
+                    list_val.append(val)
+            cursor.execute("""INSERT INTO test values(?,?,?,?,?,?,?,?)""", list_val)
+            cursor.commit()
             data.clear()
         cursor.commit()
-        print('Test Check if the data is enterd in the table')
+        print('Test Check if the data is entered in the table')
         cursor.execute("""SELECT TOP 10* FROM Apple""")
         for row in cursor:
             print(row)
+
 
 # Creating the object for the class
 gdata=getdata()
