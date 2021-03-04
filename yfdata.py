@@ -60,6 +60,6 @@ class getdata:
 
 
 # Creating the object for the class
-gdata=getdata()
-gdata.missing_val()
-gdata.sql_load()
+# gdata=getdata()
+# gdata.missing_val()
+# gdata.sql_load()

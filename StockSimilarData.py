@@ -1,14 +1,5 @@
 import pandas as pd
-import time
-import numpy as np
-import matplotlib.pyplot as plt
-import statsmodels.graphics.tsaplots as sgt
-import statsmodels.tsa.stattools as sts
-from statsmodels.tsa.arima_model import ARMA
-from scipy.stats.distributions import chi2
-from scipy import stats
-import pyodbc
-import  yfinance as yf
+from LoadDatasql import loadsqlfile as lsf
 class StockSmiliar:
 
     def __init__(self):
@@ -31,9 +22,6 @@ class StockSmiliar:
         # if the case is yes then skip the comparision and exit the for loop
         if self.table_comp(orid_data, comp_data) != True:
             for val in range(len(orid_data)):
-
-                # print(round(orid_data.spx[val]),round(((orid_data.spx[val] * 10) / 100) - orid_data.spx[val], 3),round(comp_data.spx[val],2),round(orid_data.spx[val]+((orid_data.spx[val] * 10) / 100), 3))
-
                 if orid_data.lag1[val] < 0:
                     right = orid_data.lag1[val]-((orid_data.lag1[val] * 20) / 100)
                     left = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
@@ -53,6 +41,7 @@ class StockSmiliar:
             self.temp_data.append(comp_data)
             self.matched = self.matched + 1
             self.marker = 1
+            lsf().load_data(orid_data, comp_data)
 
         self.count = 0
         self.start = self.start + 1
@@ -66,9 +55,9 @@ class StockSmiliar:
     def data_forward(self, data_or, data_comp):
         # extracting the 3 pairs and send it over to the above function for comparision
         while (len(data_comp.lag1[self.i:len(data_comp)])>= len(data_or)):
-            print('DataForward--->',self.i)
+            # print('DataForward--->',self.i)
             self.extract_pattern(data_or, data_comp[self.i:self.i+3])
-        print('printing the common', self.matched)
+        # print('printing the common', self.matched)
         self.col.append(self.matched)
         self.i=0
         self.start=0
@@ -97,26 +86,3 @@ class StockSmiliar:
         # match.to_csv('match.csv')
         # self.write_file()
         return match
-
-    # def write_file(self):
-    #     f = open("myfile.txt", "x")
-    #     f.write(self.final_list)
-start_time=time.perf_counter()
-raw_csv_data = pd.read_csv("StockDtaonminfoyweeklast.csv")
-raw_csv_data=raw_csv_data.set_index('Datetime')
-df_comp = pd.DataFrame(raw_csv_data.Close)
-df_comp['lag1'] = df_comp.Close-df_comp.Close.shift(1)
-df_comp = df_comp.drop(['2021-01-11 09:30:00-05:00'], axis=0)
-len_df=len(df_comp)
-# df_comp.date = pd.to_datetime(df_comp.date, dayfirst=True)
-# df_comp.set_index("date", inplace=True)
-# df_comp = df_comp.asfreq('b')
-# df_comp = df_comp.fillna(method='ffill')
-# train_list = df_comp.iloc[2:5]
-# print(train_list)
-obj_sm = StockSmiliar()
-obj_sm.train_dat(df_comp)
-finish_time=time.perf_counter()
-print(f'Finished in {round(finish_time-start_time)/3600} hours(h)')
-# obj_sm.data_forward(train_list, df_comp)
-# //addded the new line
