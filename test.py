@@ -1,5 +1,5 @@
-class test:
-    def __init__(self):
+from LoadDatasql import loadsqlfile as lf
 
-    def add(a,b):
-        print(a+b)
+
+a=['2021-02-04 15:00:00-05:00', 136.71209716796875, -0.0279083251953125, '2021-01-14 12:08:00-05:00', 129.97500610351562, -0.029998779296875]
+lf().format_modify(a)

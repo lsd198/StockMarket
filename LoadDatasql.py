@@ -50,12 +50,15 @@ class loadsqlfile:
             m = int(list.split(' ')[0].split('-')[1].strip("0"))
             d = int(list.split(' ')[0].split('-')[2].strip("0"))
             h = int(list.split(' ')[1].split(':')[0].strip("0"))
-            mi = int(list.split(' ')[1].split(':')[1].strip("0"))
+            if list.split(' ')[1].split(':')[1].strip("0")=='':
+                val = datetime.datetime(y, m, d, h)
+            else:
+                val = datetime.datetime(y, m, d, h, int(list.split(' ')[1].split(':')[1].strip("0")))
+
             # Seond is not calculate becasuse the data is extracted for every minute
             # .Becasue of which the second will always be 00
             # se = int(list[1].split(' ')[1].split(':')[2].split('-')[0].strip("0"))
 
-            val = datetime.datetime(y, m, d, h, mi )
         return val
 
     def load_data(self,orid_data, comp_data):
