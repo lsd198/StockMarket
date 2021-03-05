@@ -1,5 +1,6 @@
 import pandas as pd
 from LoadDatasql import loadsqlfile as lsf
+import warnings
 class StockSmiliar:
 
     def __init__(self):
@@ -20,6 +21,8 @@ class StockSmiliar:
     def extract_pattern(self, orid_data, comp_data):
         # Below function will run to check if we are comparing the same part of the table
         # if the case is yes then skip the comparision and exit the for loop
+        comp_data=comp_data.copy()
+        comp_data.reset_index(inplace=True, drop=True)
         if self.table_comp(orid_data, comp_data) != True:
             for val in range(len(orid_data)):
                 if orid_data.lag1[val] < 0:
@@ -68,6 +71,7 @@ class StockSmiliar:
         for i in reversed(range(len(df_comp))):
             if i >=3:
                 comp_list = df_comp.iloc[i-2:i+1]
+                comp_list.reset_index(inplace=True,drop=True)
                 self.data_forward(comp_list,df_comp)
                 # print('Loop run-->', i,'Matchged values for this loop', self.matched)
                 if self.matched>0:
