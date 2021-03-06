@@ -11,10 +11,10 @@ class StockSmiliar:
         self.start = 0
         self.matched = 0
         self.col = []
-        self.temp_data=[]
+        self.temp_data = []
         self.orgdata = pd.DataFrame()
         self.strattest = 0
-        self.final_list=[]
+        self.final_list = []
 # vARIABLE ASSIGNMENT TO STORE THE INDEX NUMBER WITH VALUES  OF THE MATCHED VALUES
 # cRETAE LIST INSISDE LIST. INSIDE LIST WILL CONSIST OF SERIES THAT WILL HAVE THE VALUES AND INDEX NUMBER OF MATCHED ONE
 
@@ -44,7 +44,7 @@ class StockSmiliar:
             self.temp_data.append(comp_data)
             self.matched = self.matched + 1
             self.marker = 1
-            lsf().load_data(orid_data, comp_data)
+            lsf().load_data(orid_data, comp_data,self.orgdata)
 
         self.count = 0
         self.start = self.start + 1
@@ -66,13 +66,14 @@ class StockSmiliar:
         self.start=0
 
 # Below fucntion will prepare the data that will later compared to that the whole data set
-    def train_dat(self,df_comp):
-        loop_list=[]
+    def train_dat(self, df_comp):
+        loop_list = []
+        self.orgdata = df_comp.copy()
         for i in reversed(range(len(df_comp))):
-            if i >=3:
+            if i >= 3:
                 comp_list = df_comp.iloc[i-2:i+1]
-                comp_list.reset_index(inplace=True,drop=True)
-                self.data_forward(comp_list,df_comp)
+                comp_list.reset_index(inplace=True, drop=True)
+                self.data_forward(comp_list, df_comp)
                 # print('Loop run-->', i,'Matchged values for this loop', self.matched)
                 if self.matched>0:
                     loop_list.append(comp_list)
