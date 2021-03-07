@@ -41,6 +41,7 @@ class loadsqlfile:
         return list_c
 
     def search_dat(self, ls, d_or):
+        # adding the comment
         val = []
         warnings.warn('Creating the next time tamp data and storing in the list')
         for i in ls:
