@@ -1,5 +1,6 @@
 import pandas as pd
 from LoadDatasql import loadsqlfile as lsf
+import warnings
 class StockSmiliar:
 
     def __init__(self):
@@ -10,38 +11,36 @@ class StockSmiliar:
         self.start = 0
         self.matched = 0
         self.col = []
-        self.temp_data=[]
+        self.temp_data = []
         self.orgdata = pd.DataFrame()
-        self.strattest = 0
-        self.final_list=[]
-# vARIABLE ASSIGNMENT TO STORE THE INDEX NUMBER WITH VALUES  OF THE MATCHED VALUES
-# cRETAE LIST INSISDE LIST. INSIDE LIST WILL CONSIST OF SERIES THAT WILL HAVE THE VALUES AND INDEX NUMBER OF MATCHED ONE
+        self.final_list = []
 
-    def extract_pattern(self, orid_data, comp_data):
-        # Below function will run to check if we are comparing the same part of the table
-        # if the case is yes then skip the comparision and exit the for loop
+
+    def extract_pattern(self, orid_data, comp_data, uniq):
+
+        comp_data=comp_data.copy()
+        comp_data.reset_index(inplace=True, drop=True)
         if self.table_comp(orid_data, comp_data) != True:
             for val in range(len(orid_data)):
-                if orid_data.lag1[val] < 0:
-                    right = orid_data.lag1[val]-((orid_data.lag1[val] * 20) / 100)
-                    left = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
-                else:
-                    right = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
-                    left = orid_data.lag1[val] - ((orid_data.lag1[val] * 20) / 100)
-                if left <= comp_data.lag1[val] <= right:
+                if orid_data.lag1[val] == 0:
                     self.count = self.count + 1
                 else:
-                    break
+                    if orid_data.lag1[val] < 0:
+                        right = orid_data.lag1[val]-((orid_data.lag1[val] * 20) / 100)
+                        left = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
+                    else:
+                        right = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
+                        left = orid_data.lag1[val] - ((orid_data.lag1[val] * 20) / 100)
+                    if left <= comp_data.lag1[val] <= right:
+                        self.count = self.count + 1
+                    else:
+                        break
         if self.count == len((orid_data.lag1)):
-            # Modify the code here
-            # add the mathced data in the table in the list
-            # Below create the list and add the data
-            # create if condtion to check if the data to be entered is similar to the compared one or if both of them  are
-            # same in this case skip that and do not add else adda the code into the list
             self.temp_data.append(comp_data)
             self.matched = self.matched + 1
             self.marker = 1
-            lsf().load_data(orid_data, comp_data)
+            warnings.warn('Running into the loadSql python file')
+            lsf().load_data(orid_data, comp_data,self.orgdata, uniq)
 
         self.count = 0
         self.start = self.start + 1
@@ -52,33 +51,36 @@ class StockSmiliar:
         else:
             return  False
 
-    def data_forward(self, data_or, data_comp):
+    def data_forward(self, data_or, data_comp, uniq):
         # extracting the 3 pairs and send it over to the above function for comparision
         while (len(data_comp.lag1[self.i:len(data_comp)])>= len(data_or)):
             # print('DataForward--->',self.i)
-            self.extract_pattern(data_or, data_comp[self.i:self.i+3])
+            self.extract_pattern(data_or, data_comp[self.i:self.i+3],uniq)
         # print('printing the common', self.matched)
         self.col.append(self.matched)
-        self.i=0
-        self.start=0
+        self.i = 0
+        self.start = 0
 
 # Below fucntion will prepare the data that will later compared to that the whole data set
-    def train_dat(self,df_comp):
-        loop_list=[]
+    def train_dat(self, df_comp):
+        loop_list = []
+        self.orgdata = df_comp.copy()
         for i in reversed(range(len(df_comp))):
-            if i >=3:
+            if i >= 3:
+
                 comp_list = df_comp.iloc[i-2:i+1]
-                self.data_forward(comp_list,df_comp)
+                comp_list.reset_index(inplace=True, drop=True)
+                self.data_forward(comp_list, df_comp, (i-(len(df_comp)+1)))
                 # print('Loop run-->', i,'Matchged values for this loop', self.matched)
-                if self.matched>0:
+                if self.matched > 0:
                     loop_list.append(comp_list)
                     loop_list.append(self.temp_data.copy())
                     self.final_list.append(loop_list.copy())
                     loop_list.clear()
 
-                self.matched=0
+                self.matched = 0
                 self.temp_data.clear()
-                self.strattest=i
+
 
             # else:
             #     break
