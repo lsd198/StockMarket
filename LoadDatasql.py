@@ -41,6 +41,7 @@ class loadsqlfile:
         return list_c
 
     def search_dat(self, ls, d_or):
+        # adding the comment
         val = []
         warnings.warn('Creating the next time tamp data and storing in the list')
         for i in ls:
@@ -63,8 +64,9 @@ class loadsqlfile:
         # d_or.set_index('Datetime',inplace=True)
         warnings.warn('Running the check_format function')
         list_final = self.check_format(orid_data, comp_data, d_or)
-        print('Loading the data into a table in SQL Server.')
+
         if list_final[1] == 1:
+            print('Loading the data into a table in SQL Server.')
             conn = pyodbc.connect('Driver={SQL Server};'
                                   'Server=LAPTOP-NOKA9LP8;'
                                   'Database=StockMarket;'

@@ -2,34 +2,49 @@ import numpy as np
 import pandas as pd
 import datetime
 import pyodbc
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-
-class Min_price_nxt:
-    def __init__(self):
-        self.df_or = pd.read_csv('StockDtaonminfoyweeklast.csv')
-        self.mt_data  = pd.read_csv('StockMatchData,csv')
-    def min_fp(self):
-        # // to do analysis on the original table we have to covert the datetime table into datetime64
-        self.date_time_cov()
-        data_copy = self.df_or.copy()
-        data_copy['Datetime'] = self.date_time_cov()
-        print(data_copy)
-    def date_time_cov(self):
-        var_list = [i for i in self.df_or.Datetime]
-        final_list = []
-        for ls in var_list:
-            y = int(ls.split(' ')[0].split('-')[0].strip("0"))
-            m = int(ls.split(' ')[0].split('-')[1].strip("0"))
-            d = int(ls.split(' ')[0].split('-')[2].strip("0"))
-            h = int(ls.split(' ')[1].split(':')[0].strip("0"))
-            if ls.split(' ')[1].split(':')[1].strip("0") == '':
-                final_list.append(datetime.datetime(y, m, d, h))
+class c_analysis:
+    # dump all the files that are generated into some location which will be easy to reload
+    def load_analyze(self):
+        conn = pyodbc.connect('Driver={SQL Server};'
+                          'Server=LAPTOP-NOKA9LP8;'
+                          'Database=StockMarket;'
+                          'Trusted_Connection=yes;')
+        l_data = pd.read_sql('Select * from StockMatch2',conn)
+        l_data.to_csv('l_data.csv')
+        c_data = pd.DataFrame({'Pattern_ID':[i for i in l_data.Pattern_ID.value_counts().index], 'p_count':
+                               [l_data.Pattern_ID.value_counts()[i] for i in l_data.Pattern_ID.value_counts().index]})
+        # Selecting the maximum count for the pattern
+        c_data.to_csv('c_data.csv')
+        max_data = l_data[l_data.Pattern_ID == c_data[c_data.p_count == c_data.p_count.max()].Pattern_ID[0]]
+        max_data.reset_index(inplace=True, drop=True)
+    def plot_trend(self,index):
+        # c_data = pd.read_csv('c_data.csv')
+        l_data = pd.read_csv('l_data.csv')
+        max_data = l_data[l_data.Pattern_ID == index]
+        max_data.reset_index(inplace=True, drop=True)
+        for i in range(len(max_data)):
+            if i == 0:
+                a = [max_data.loc[i].lag_1_c, max_data.loc[i].lag_2_c, max_data.loc[i].lag_3_c,max_data.loc[i].Lag_1_sv]
+                plt.plot(a)
+                a = [max_data.loc[i].Lag_1_m, max_data.loc[i].Lag_2_m, max_data.loc[i].Lag_3_m,max_data.loc[i].Lag_2_sv]
+                plt.plot(a)
             else:
-                final_list.append(datetime.datetime(y, m, d, h, int(ls.split(' ')[1].split(':')[1].strip("0"))))
-        return final_list
+                a = [max_data.loc[i].Lag_1_m, max_data.loc[i].Lag_2_m, max_data.loc[i].Lag_3_m,max_data.loc[i].Lag_2_sv]
+                plt.plot(a)
 
 
 
 
-mpn=Min_price_nxt()
-mpn.min_fp()
+
+
+        # // create a column containg the all the patternID and with their repetetions
+
+
+c_ob = c_analysis()
+
+# c_ob.load_analyze()
+c_ob.plot_trend(-4151)
+print(c_ob)
