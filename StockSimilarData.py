@@ -22,19 +22,20 @@ class StockSmiliar:
         comp_data.reset_index(inplace=True, drop=True)
         if self.table_comp(orid_data, comp_data) != True:
             for val in range(len(orid_data)):
+                # updating the pattern match code
                 if orid_data.lag1[val] == 0:
+                    right = 0.01
+                    left = -0.01
+                elif orid_data.lag1[val] < 0:
+                    right = orid_data.lag1[val]-((orid_data.lag1[val] * 10) / 100)
+                    left = orid_data.lag1[val] + ((orid_data.lag1[val] * 10) / 100)
+                else:
+                    right = orid_data.lag1[val] + ((orid_data.lag1[val] * 10) / 100)
+                    left = orid_data.lag1[val] - ((orid_data.lag1[val] * 10) / 100)
+                if left <= comp_data.lag1[val] <= right:
                     self.count = self.count + 1
                 else:
-                    if orid_data.lag1[val] < 0:
-                        right = orid_data.lag1[val]-((orid_data.lag1[val] * 20) / 100)
-                        left = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
-                    else:
-                        right = orid_data.lag1[val] + ((orid_data.lag1[val] * 20) / 100)
-                        left = orid_data.lag1[val] - ((orid_data.lag1[val] * 20) / 100)
-                    if left <= comp_data.lag1[val] <= right:
-                        self.count = self.count + 1
-                    else:
-                        break
+                    break
         if self.count == len((orid_data.lag1)):
             self.temp_data.append(comp_data)
             self.matched = self.matched + 1

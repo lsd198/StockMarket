@@ -13,7 +13,7 @@ class getdata:
     def __init__(self):
         print('inside the init function')
         self.app = yf.Ticker("AAPL")
-        self.dataset_org = pd.DataFrame(self.app.history(start="2021-02-22", end="2021-02-27", interval="1m"))
+        self.dataset_org = pd.DataFrame(self.app.history(start="2021-03-08", end="2021-03-11", interval="1m"))
         self.col = self.dataset_org.columns
 
     # /check for the missing values
@@ -60,6 +60,6 @@ class getdata:
 
 
 # Creating the object for the class
-# gdata=getdata()
-# gdata.missing_val()
-# gdata.sql_load()
+gdata=getdata()
+gdata.missing_val()
+gdata.sql_load()
